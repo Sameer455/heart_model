@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 @st.cache_resource
 def load_and_train_model():
     # Load dataset
-    url = https://github.com/Sameer455/heart_model/blob/main/heart.csv  # Update path
+    url = 'https://github.com//Sameer455//heart_model//blob//main//heart.csv'  # Update path
     df = pd.read_csv(url)
 
     # Define features and target
