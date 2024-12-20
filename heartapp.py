@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
+@st.cache_resource
 def load_and_train_model():
     # Load dataset
     url = "C:\\Users\\shaik\\OneDrive\\Desktop\\project\\heart.csv"  # Update path
@@ -23,35 +25,40 @@ def load_and_train_model():
     # Evaluate the model
     predictions = model.predict(X_test)
     acc = accuracy_score(y_test, predictions)
-    print(f"Model trained successfully! Accuracy: {acc:.2f}")
+    st.success(f"Model trained successfully! Accuracy: {acc:.2f}")
     return model
 
-def predict_heart_disease(model):
-    print("Enter patient details for heart disease prediction:")
-    age = int(input("Age: "))
-    sex = int(input("Sex (0 = female, 1 = male): "))
-    cp = int(input("Chest Pain Type (0-3): "))
-    trestbps = int(input("Resting Blood Pressure: "))
-    chol = int(input("Cholesterol: "))
-    fbs = int(input("Fasting Blood Sugar > 120 mg/dl (1 = True, 0 = False): "))
-    restecg = int(input("Resting ECG Results (0-2): "))
-    thalach = int(input("Max Heart Rate Achieved: "))
-    exang = int(input("Exercise-Induced Angina (0 = No, 1 = Yes): "))
-    oldpeak = float(input("ST Depression Induced: "))
-    slope = int(input("Slope of Peak Exercise (0-2): "))
-    ca = int(input("Number of Major Vessels (0-4): "))
-    thal = int(input("Thalassemia (1 = Normal, 2 = Fixed Defect, 3 = Reversible Defect): "))
+def main():
+    st.title("Heart Disease Prediction App")
 
-    # Prepare input features
-    input_data = np.array([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
-    prediction = model.predict(input_data)
+    # Load model
+    model = load_and_train_model()
 
-    result = "Positive for Heart Disease" if prediction[0] == 1 else "Negative for Heart Disease"
-    print(f"Prediction: {result}")
+    # Create input fields
+    st.header("Patient Details")
+    age = st.number_input("Age", min_value=1, max_value=120, value=25)
+    sex = st.selectbox("Sex", options=["Female (0)", "Male (1)"], index=1)
+    cp = st.selectbox("Chest Pain Type", options=["0", "1", "2", "3"])
+    trestbps = st.number_input("Resting Blood Pressure", min_value=80, max_value=200, value=120)
+    chol = st.number_input("Cholesterol", min_value=100, max_value=600, value=200)
+    fbs = st.selectbox("Fasting Blood Sugar > 120 mg/dl", options=["No (0)", "Yes (1)"], index=0)
+    restecg = st.selectbox("Resting ECG Results", options=["0", "1", "2"], index=0)
+    thalach = st.number_input("Max Heart Rate Achieved", min_value=60, max_value=220, value=150)
+    exang = st.selectbox("Exercise-Induced Angina", options=["No (0)", "Yes (1)"], index=0)
+    oldpeak = st.number_input("ST Depression Induced", min_value=0.0, max_value=6.0, value=1.0, format="%.1f")
+    slope = st.selectbox("Slope of Peak Exercise", options=["0", "1", "2"], index=1)
+    ca = st.selectbox("Number of Major Vessels", options=["0", "1", "2", "3", "4"], index=0)
+    thal = st.selectbox("Thalassemia", options=["Normal (1)", "Fixed Defect (2)", "Reversible Defect (3)"], index=2)
+
+    # Convert inputs to model-friendly format
+    input_data = np.array([[age, int(sex[0]), int(cp), trestbps, chol, int(fbs[0]), int(restecg),
+                            thalach, int(exang[0]), oldpeak, int(slope[0]), int(ca[0]), int(thal[0])]])
+
+    # Predict
+    if st.button("Predict"):
+        prediction = model.predict(input_data)
+        result = "Positive for Heart Disease" if prediction[0] == 1 else "Negative for Heart Disease"
+        st.subheader(f"Prediction: {result}")
 
 if __name__ == "__main__":
-    # Load and train model
-    rf_model = load_and_train_model()
-
-    # Predict based on user input
-    predict_heart_disease(rf_model)
+    main()
