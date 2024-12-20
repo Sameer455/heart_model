@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score
 
 def load_and_train_model():
     # Load dataset
-    url = "C:\\Users\\shaik\\OneDrive\\Desktop\\project\\heart.csv"  # Update path
+    url = ""  # Update path
     df = pd.read_csv(url)
 
     # Define features and target
